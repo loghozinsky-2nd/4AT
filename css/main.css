@@ -11,7 +11,7 @@
 .chat-messages,
 .chat textarea,
 .chat-name {
-  border: 1px soid blue;
+  border: 1px solid blue;
 }
 
 .chat-messages {
