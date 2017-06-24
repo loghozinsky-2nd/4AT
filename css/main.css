@@ -11,7 +11,7 @@
 .chat-messages,
 .chat textarea,
 .chat-name {
-  border: 1px solid blue;
+  border: 1px solid #eee;
 }
 
 .chat-messages {
@@ -34,14 +34,15 @@
 
 .chat textarea {
   width: 100%;
+  max-width: 100%;
   padding: 10px;
 }
 
-.chat-status span {
-  color: red;
+.chat-status {
+  color: #e5e;
 }
 
 .chat textarea,
 .chat-name {
-  outline: none;
+  outline-color: #e5e;
 }
