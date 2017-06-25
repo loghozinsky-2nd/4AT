@@ -4,9 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&amp;subset=cyrillic" rel="stylesheet">
+    <title>For All Talk - просто чат</title>
 </head>
 <body>
-    
+    <div class="chat">
+        <input type="text" class="chat-name" placeholder="Укажите ваше имя!">
+        <div class="chat-messages" id="chat-message"></div>
+        <textarea placeholder="Введите текст"></textarea>
+        <div class="chat-status">
+            статус: <span>ок</span>
+        </div>
+        <div class="poweredby"><a href="index.html">4AT - For All Talk</a></div>
+    </div>
+    <script src="http://127.0.0.1:8080/socket.io/socket.io.js"></script>
+    <script>
+        (function(){
+            var getNode = function(s){
+                return document.querySelector(s);
+            },
+            status = getNode('.chat-status span'),
+            message = getNode('.chat-message'),
+            messages = getNode('.chat-messages'),
+            textarea = getNode('.chat textarea'),
+            chatName = getNode('.chat-name'),
+            statusDefault = status.textContent;
+            setStatus = function(s){
+                status.textContent = s;
+                if(s !== statusDefault){
+                    var delay = setTimeout(function(){
+                        setStatus(statusDefault);
+                        clearInterval(delay);
+                    }, 750)
+                } 
+            };
+            setStatus('загрузка..');
+            try {
+                var socket = io.connect('http://127.0.0.1:8080');
+            } catch(e){
+            }
+            if(socket !== undefined){
+                socket.on('output', function(data){
+                    if(data.length){
+                        for(var x=0;x<data.length;x=x+1){
+                            var message = document.createElement('div');
+                            message.setAttribute('class', 'chat-message');
+                            message.setAttribute('id', 'chat-message');
+                            message.textContent = data[x].name + ': ' + data[x].message;
+
+                            messages.appendChild(message);
+                            messages.insertBefore(message, messages.firstChild);
+                        }
+                    }
+                });
+                socket.on('status', function(data){
+                    setStatus((typeof data === 'object') ? data.message : data);
+                    if(data.clear === true){
+                        textarea.value = '';
+                    }
+                });
+                textarea.addEventListener('keydown', function(event){
+                    var self = this,
+                        name = chatName.value;
+                    if(event.which === 13 && event.shiftKey === false) {
+                        socket.emit('input', {
+                            name: name,
+                            message: self.value
+                        });
+                        event.preventDefault();
+                    }
+                })
+            }
+        })();
+    </script>
 </body>
 </html>
